@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Meccha Chameleon — Anniversary Edition</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1a14;
+      --accent: #7cffb2;
+      --gold: #ffe566;
+      --text: #e8f5e9;
+      --muted: #a5d6a7;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      height: 100%; overflow: hidden;
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg); color: var(--text);
+      touch-action: manipulation;
+    }
+    .scene {
+      position: relative; width: 100vw; height: 100vh; overflow: hidden;
+      background:
+        radial-gradient(ellipse at 30% 20%, rgba(124,255,178,0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 80%, rgba(255,107,157,0.06) 0%, transparent 45%),
+        linear-gradient(160deg, #0a1410 0%, #13241c 40%, #0f1a14 100%);
+    }
+    .scene::before {
+      content: ''; position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(124,255,178,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(124,255,178,0.03) 1px, transparent 1px);
+      background-size: 40px 40px; pointer-events: none; z-index: 0;
+    }
+    .scene::after {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.5) 100%);
+      pointer-events: none; z-index: 5;
+    }
+    .particle {
+      position: absolute; width: 6px; height: 6px; background: var(--accent);
+      border-radius: 50%; opacity: 0.4;
+      animation: floatParticle 14s infinite ease-in-out;
+      z-index: 2; pointer-events: none; box-shadow: 0 0 10px var(--accent);
+    }
+    @keyframes floatParticle {
+      0%,100% { transform: translate(0,0) scale(1); opacity: 0.3; }
+      50% { transform: translate(25px,-50px) scale(1.4); opacity: 0.7; }
+    }
+    .header {
+      position: absolute; top: 0; left: 0; right: 0; z-index: 20;
+      padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;
+      background: linear-gradient(180deg, rgba(15,26,20,0.9) 0%, transparent 100%);
+      pointer-events: none;
+    }
+    .title-area h1 {
+      font-family: 'Press Start 2P', system-ui;
+      font-size: clamp(0.7rem, 2.8vw, 1rem);
+      color: var(--accent); text-shadow: 0 0 12px rgba(124,255,178,0.5);
+    }
+    .title-area p { font-size: 0.75rem; color: var(--muted); margin-top: 4px; font-weight: 600; }
+    .progress {
+      background: rgba(0,0,0,0.55); border: 2px solid rgba(124,255,178,0.35);
+      border-radius: 12px; padding: 8px 14px; font-weight: 700;
+      display: flex; align-items: center; gap: 6px; pointer-events: auto;
+      font-family: 'Press Start 2P', system-ui; font-size: 0.65rem;
+    }
+    .progress-count { color: var(--gold); font-size: 0.85rem; }
+    .intro-overlay {
+      position: absolute; inset: 0; z-index: 50;
+      background: radial-gradient(ellipse at center, #1a2e24 0%, #0a1410 100%);
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      text-align: center; padding: 24px;
+      transition: opacity 0.7s ease, visibility 0.7s;
+    }
+    .intro-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    .intro-content { max-width: 420px; }
+    .game-logo {
+      font-family: 'Press Start 2P', system-ui;
+      font-size: clamp(1.1rem, 5vw, 1.6rem);
+      color: var(--accent); margin-bottom: 8px;
+      text-shadow: 0 0 20px rgba(124,255,178,0.6);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.75; } }
+    .intro-content h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 16px; color: var(--gold); }
+    .intro-content p { font-size: 0.98rem; line-height: 1.7; color: var(--muted); margin-bottom: 28px; font-weight: 500; }
+    .start-btn {
+      background: linear-gradient(135deg, #7cffb2, #2ecc71); color: #0a1410;
+      border: none; padding: 14px 36px; font-size: 1rem; font-weight: 800;
+      border-radius: 12px; cursor: pointer;
+      box-shadow: 0 0 24px rgba(124,255,178,0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+      font-family: inherit; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .start-btn:hover, .start-btn:active { transform: scale(1.06); box-shadow: 0 0 32px rgba(124,255,178,0.6); }
+    .hint {
+      position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%);
+      z-index: 15; background: rgba(0,0,0,0.65);
+      border: 1px solid rgba(124,255,178,0.3); padding: 10px 18px;
+      border-radius: 12px; font-size: 0.88rem; font-weight: 600;
+      color: var(--accent); pointer-events: none; transition: opacity 0.5s;
+      max-width: 90%; text-align: center;
+    }
+    .hint.fade { opacity: 0; }
+    .figure {
+      position: absolute; width: 46px; height: 70px; cursor: pointer; z-index: 10;
+      transition: transform 0.25s, filter 0.25s, opacity 0.25s;
+      opacity: 0.22; filter: brightness(0.85);
+    }
+    .figure:hover, .figure:active { opacity: 0.55; filter: brightness(1.1); transform: scale(1.12); }
+    .figure.found { opacity: 0; pointer-events: none; transform: scale(1.6); transition: all 0.5s ease; }
+    .figure-body { position: relative; width: 100%; height: 100%; color: #e0f2e9; }
+    .figure-head {
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 20px; height: 20px; background: currentColor; border-radius: 50%;
+    }
+    .figure-torso {
+      position: absolute; top: 18px; left: 50%; transform: translateX(-50%);
+      width: 26px; height: 26px; background: currentColor; border-radius: 6px 6px 3px 3px;
+    }
+    .figure-arm-l, .figure-arm-r {
+      position: absolute; top: 22px; width: 7px; height: 24px;
+      background: currentColor; border-radius: 4px;
+    }
+    .figure-arm-l { left: 3px; transform: rotate(12deg); }
+    .figure-arm-r { right: 3px; transform: rotate(-12deg); }
+    .figure-leg-l, .figure-leg-r {
+      position: absolute; bottom: 0; width: 9px; height: 26px;
+      background: currentColor; border-radius: 3px;
+    }
+    .figure-leg-l { left: 10px; transform: rotate(4deg); }
+    .figure-leg-r { right: 10px; transform: rotate(-4deg); }
+    .modal {
+      position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.82);
+      backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center;
+      opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; padding: 16px;
+    }
+    .modal.active { opacity: 1; visibility: visible; }
+    .modal-content {
+      background: linear-gradient(165deg, #1a2e24, #0f1a14);
+      border: 2px solid rgba(124,255,178,0.35); border-radius: 20px; padding: 18px;
+      max-width: 360px; width: 100%; box-shadow: 0 0 40px rgba(124,255,178,0.15);
+      transform: scale(0.88) translateY(16px);
+      transition: transform 0.35s cubic-bezier(0.34,1.4,0.64,1); text-align: center;
+    }
+    .modal.active .modal-content { transform: scale(1) translateY(0); }
+    .photo-frame {
+      width: 100%; aspect-ratio: 1; border-radius: 14px; overflow: hidden;
+      margin-bottom: 14px; border: 2px solid rgba(255,229,102,0.4); background: #0a1410;
+    }
+    .photo-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .photo-caption { font-size: 1.15rem; font-weight: 800; color: var(--gold); margin-bottom: 6px; }
+    .photo-sub { font-size: 0.9rem; color: var(--muted); margin-bottom: 16px; line-height: 1.5; font-weight: 500; }
+    .close-btn {
+      background: linear-gradient(135deg, #7cffb2, #2ecc71); color: #0a1410;
+      border: none; padding: 10px 28px; border-radius: 10px;
+      font-size: 0.95rem; font-weight: 800; cursor: pointer; font-family: inherit;
+      transition: transform 0.2s;
+    }
+    .close-btn:hover, .close-btn:active { transform: scale(1.05); }
+    .complete-overlay {
+      position: absolute; inset: 0; z-index: 60;
+      background: radial-gradient(ellipse at center, rgba(26,46,36,0.98) 0%, rgba(10,20,16,0.99) 100%);
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      text-align: center; padding: 24px;
+      opacity: 0; visibility: hidden; transition: opacity 0.7s, visibility 0.7s;
+    }
+    .complete-overlay.active { opacity: 1; visibility: visible; }
+    .complete-overlay .game-logo { margin-bottom: 12px; }
+    .complete-overlay h2 { font-size: clamp(1.4rem,5vw,1.9rem); font-weight: 800; color: var(--gold); margin-bottom: 16px; }
+    .complete-overlay p { font-size: 1rem; line-height: 1.75; max-width: 340px; color: var(--muted); margin-bottom: 28px; font-weight: 500; }
+    .hearts { font-size: 2.2rem; margin-bottom: 12px; animation: floatHearts 2.5s infinite ease-in-out; }
+    @keyframes floatHearts { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    @media (max-width: 480px) {
+      .figure { width: 40px; height: 62px; }
+      .header { padding: 10px 12px; }
+      .hint { font-size: 0.8rem; bottom: 14px; }
+      .progress { font-size: 0.55rem; padding: 6px 10px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="scene" id="scene">
+    <div class="particle" style="top:12%; left:8%; animation-delay:0s;"></div>
+    <div class="particle" style="top:28%; left:75%; animation-delay:2s;"></div>
+    <div class="particle" style="top:55%; left:18%; animation-delay:4s;"></div>
+    <div class="particle" style="top:70%; left:82%; animation-delay:1s;"></div>
+    <div class="particle" style="top:40%; left:45%; animation-delay:3s;"></div>
+    <div class="particle" style="top:85%; left:30%; animation-delay:5s;"></div>
+
+    <div class="header">
+      <div class="title-area">
+        <h1>MECCHA CHAMELEON</h1>
+        <p>Anniversary Edition</p>
+      </div>
+      <div class="progress">
+        <span>FOUND</span>
+        <span class="progress-count" id="count">0</span>
+        <span>/10</span>
+      </div>
+    </div>
+
+    <div class="hint" id="hint">Find the 10 hidden figures… they blend in pretty well 🦎</div>
+
+    <div class="intro-overlay" id="intro">
+      <div class="intro-content">
+        <div class="game-logo">MECCHA<br>CHAMELEON</div>
+        <h2>Anniversary Edition</h2>
+        <p>
+          10 figures are hiding on this stage.<br>
+          Just like the game — they blend in hard.<br><br>
+          Tap them to reveal a real memory of us.<br>
+          Find every single one.
+        </p>
+        <button class="start-btn" id="startBtn">Start Seeking</button>
+      </div>
+    </div>
+
+    <div class="complete-overlay" id="complete">
+      <div class="hearts">💚💛💚</div>
+      <div class="game-logo">CLEAR!</div>
+      <h2>You found all 10</h2>
+      <p>
+        Just like in Meccha Chameleon,<br>
+        you always manage to find me —<br>
+        no matter how well I try to blend in.<br><br>
+        These are our colours.<br>
+        Happy Anniversary.<br>
+        I love you.
+      </p>
+      <button class="start-btn" onclick="location.reload()">Play again</button>
+    </div>
+  </div>
+
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <div class="photo-frame">
+        <img id="modalImg" src="" alt="Memory">
+      </div>
+      <div class="photo-caption" id="modalCaption"></div>
+      <div class="photo-sub" id="modalSub"></div>
+      <button class="close-btn" id="closeModal">Got it</button>
+    </div>
+  </div>
+
+  <script>
+    const memories = [
+      { img: "photos/8F4BFF3D-23E5-4905-85F3-76686D4E6DD9", caption: "Places in the world", sub: "We went to a lot of places in the world" },
+      { img: "photos/BAB2E009-3180-4196-AB54-55E2E5517B19", caption: "Special people", sub: "We met each other’s special people" },
+      { img: "photos/875582A9-FDB3-469B-91A2-FECBC16123DA", caption: "New things", sub: "We experienced new things together" },
+      { img: "photos/1D51256B-7147-47D9-B788-1D30CE26E361", caption: "Home places", sub: "We went to each other’s home places" },
+      { img: "photos/D68A4EBC-623D-411F-97FB-4BB130BB14B8", caption: "Fun days", sub: "We had so many fun days" },
+      { img: "photos/49C8235F-D2C5-4BA4-BA11-264AA419C0A5", caption: "Drunk days", sub: "We had so many drunk days" },
+      { img: "photos/8B79A5EC-7668-4B0A-9EA0-6D5D0E4E0191", caption: "Ordinary days", sub: "We had special ordinary days" },
+      { img: "photos/920CA12A-B37E-417D-AF22-393263F8BDC5", caption: "Someone’s glasses", sub: "We had someone’s glasses somehow" },
+      { img: "photos/4B34A328-7E89-4836-A05B-740493F322AE", caption: "Family", sub: "Our family will be the one for the other too" },
+      { img: "photos/4B2B0A35-055A-4F2C-8539-6A0A4331B360", caption: "Happiness", sub: "We have so many happiness in the memories" }
+    ];
+
+    const positions = [
+      { top: "16%", left: "10%" }, { top: "20%", left: "72%" }, { top: "33%", left: "38%" },
+      { top: "46%", left: "6%" }, { top: "50%", left: "80%" }, { top: "60%", left: "25%" },
+      { top: "68%", left: "58%" }, { top: "26%", left: "88%" }, { top: "76%", left: "12%" },
+      { top: "40%", left: "55%" }
+    ];
+
+    let foundCount = 0;
+    const foundSet = new Set();
+    const scene = document.getElementById('scene');
+    const countEl = document.getElementById('count');
+    const modal = document.getElementById('modal');
+    const modalImg = document.getElementById('modalImg');
+    const modalCaption = document.getElementById('modalCaption');
+    const modalSub = document.getElementById('modalSub');
+    const intro = document.getElementById('intro');
+    const complete = document.getElementById('complete');
+    const hint = document.getElementById('hint');
+
+    function createFigures() {
+      positions.forEach((pos, index) => {
+        const fig = document.createElement('div');
+        fig.className = 'figure';
+        fig.style.top = pos.top;
+        fig.style.left = pos.left;
+        fig.dataset.index = index;
+        fig.innerHTML = `<div class="figure-body"><div class="figure-head"></div><div class="figure-torso"></div><div class="figure-arm-l"></div><div class="figure-arm-r"></div><div class="figure-leg-l"></div><div class="figure-leg-r"></div></div>`;
+        fig.addEventListener('click', () => handleFind(index, fig));
+        fig.addEventListener('touchend', (e) => { e.preventDefault(); handleFind(index, fig); }, { passive: false });
+        scene.appendChild(fig);
+      });
+    }
+
+    function handleFind(index, el) {
+      if (foundSet.has(index)) return;
+      foundSet.add(index);
+      foundCount++;
+      countEl.textContent = foundCount;
+      el.classList.add('found');
+      const mem = memories[index];
+      modalImg.src = mem.img;
+      modalCaption.textContent = mem.caption;
+      modalSub.textContent = mem.sub;
+      modal.classList.add('active');
+      if (foundCount === 1) hint.classList.add('fade');
+      if (foundCount === 10) setTimeout(() => complete.classList.add('active'), 1100);
+    }
+
+    document.getElementById('closeModal').addEventListener('click', () => modal.classList.remove('active'));
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
+    document.getElementById('startBtn').addEventListener('click', () => intro.classList.add('hidden'));
+    createFigures();
+    document.body.addEventListener('touchmove', (e) => {
+      if (e.target.closest('.modal') || e.target.closest('.intro-overlay') || e.target.closest('.complete-overlay')) return;
+      e.preventDefault();
+    }, { passive: false });
+  </script>
+</body>
+</html>
